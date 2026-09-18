@@ -86,30 +86,8 @@ public class AbutterflI extends CellAI {
         {
             for (int j = 0; j < fakeGridSource[i].length; j++)
             {
-                if(fakeGridSource[i][j] != -1)
-                {
-                    continue;
-                }
-
-                fakeGridSource[i][j] = myId;
-                int[][] fakeGridSourceNextGeneration = fakeGridSourceNextGeneration(fakeGridSource,myId);
-                int count = 0;
-                for(int k = 0; k < fakeGridSourceNextGeneration.length; k++)
-                {
-                    for (int l = 0; l < fakeGridSourceNextGeneration[k].length; l++)
-                    {
-                        if(fakeGridSourceNextGeneration[k][l] == myId)
-                        {
-                            count++;
-                        }
-                    }
-                }
-                if(count > bestCount)
-                {
-                    bestCount = count;
-                    bestMove = new Location(i, j);
-                }
-                fakeGridSource[i][j] = -1;
+                stillLife(new Location(i, j), fakeGridSource, myId);
+        
             }
         }
         return bestMove;
@@ -207,5 +185,36 @@ public static int neighborCountTHEY(int[][] fakeGridSource, int row, int col, in
         }
 
         return theyCount;
+    }
+public static Location stillLife(Location Loc, int[][] fakeGridSource, int myId) {
+        int i = Loc.getRow();
+        int j = Loc.getCol();
+        if (fakeGridSource[i][j] != -1) {
+            if ((fakeGridSource[i][j] == myId && fakeGridSource[i + 1][j] != -1) || (fakeGridSource[i][j] != -1 && fakeGridSource[i + 1][j] == myId)) {
+                        if(fakeGridSource[i][j+1]==-1)
+                        {
+                            return new Location(i, j+1);
+                        }
+                        else if(fakeGridSource[i][j-1]==-1)
+                        {
+                            return new Location(i, j-1);
+                        }
+                        else if(fakeGridSource[i-1][j]==-1)
+                        {
+                            return new Location(i-1, j);
+                        }
+                        else if(fakeGridSource[i+1][j]==-1)
+                        {
+                            return new Location(i+1, j);
+                        }
+                    }
+                    if( fakeGridSource[i][j]!=myId&&fakeGridSource[i][j+1]!=myId&&fakeGridSource[i][j+2]!=myId){
+                        return new Location(i, j+1);
+                    }
+                    if( fakeGridSource[i][j]!=myId&&fakeGridSource[i+1][j]!=myId&&fakeGridSource[i+2][j]!=myId){
+                        return new Location(i+2, j);
+                    }
+         }
+        return null; // Not a still life
     }
 }
