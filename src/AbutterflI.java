@@ -41,11 +41,16 @@ public class AbutterflI extends CellAI {
         }
         if(bestMove!=null)
         {
-            if(bestMove.getRow()!=grid.getRows()-1&&bestMove.getCol()!=grid.getCols()-1)
+                if (bestMove.getRow() > 0
+                    && bestMove.getRow() < grid.getRows() - 1
+                    && bestMove.getCol() > 0
+                    && bestMove.getCol() < grid.getCols() - 1)
             {
                 int row = bestMove.getRow();
                 int col = bestMove.getCol();
-                if(grid.getCell(row+1,col)==opponent&&grid.getCell(row+1,col+1)==opponent&&grid.getCell(row,col+1)==opponent)
+                if (grid.getCell(row + 1, col) == opponent
+                    && grid.getCell(row + 1, col + 1) == opponent
+                    && grid.getCell(row, col + 1) == opponent)
                 {
                     bestMove=null;
                 }
@@ -77,7 +82,13 @@ public class AbutterflI extends CellAI {
             bestMove = findIsolatedHivePlus(grid, opponent);
         }
         if (bestMove == null) {
-            bestMove = lastResortSquare(grid, opponent);
+                for (int r = 0; r < grid.getRows(); r++) {
+                    for (int c = 0; c < grid.getCols(); c++) {
+                        if (grid.getCell(r, c) == opponent) {
+                           bestMove = lastResortSquare(grid, opponent);
+                        }
+                    }
+                }
         }
         if (bestMove == null) {
                 for (int r = 0; r < grid.getRows(); r++) {
@@ -93,16 +104,11 @@ public class AbutterflI extends CellAI {
     public static Location lastResortSquare(Grid grid, int opponentId) {
         for (int r = 0; r <= grid.getRows() - 2; r++) {
             for (int c = 0; c <= grid.getCols() - 2; c++) {
-                if (grid.getCell(r, c) != opponentId
-                        || grid.getCell(r, c + 1) != opponentId
-                        || grid.getCell(r + 1, c) != opponentId
-                        || grid.getCell(r + 1, c + 1) != opponentId) {
-                   int[][] cornerOffsets = {
-                    { -1, -1 },
-                    { -1, 2 },
-                    { 2, -1 },
-                    { 2, 2 }
-                };
+                if (grid.getCell(r, c) == opponentId
+                    && grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 1) == opponentId) {
+                   int[][] cornerOffsets = {{ -1, -1 },{ -1, 2 },{ 2, -1 },{ 2, 2 }};
 
                 for (int[] offset : cornerOffsets) {
                     int r1 = r + offset[0];
@@ -118,100 +124,160 @@ public class AbutterflI extends CellAI {
         return null;
     }
     public static Location findIsolatedHivePlus(Grid grid, int opponentId) {
-        int[][][] patterns = {
-            { {0, 1}, {0, 2}, {1, 0}, {1, 3}, {2, 1}, {2, 2} },
-            { {1, 0}, {2, 0}, {0, 1}, {3, 1}, {1, 2}, {2, 2} },
-            { {1, 0}, {1, 1}, {0, 2}, {2, 2}, {1, 3}, {2, 3} },
-            { {0, 1}, {1, 1}, {2, 0}, {2, 2}, {3, 1}, {3, 2} },
-            { {0, 1}, {1, 0}, {1, 2}, {2, 1}, {2, 3}, {3, 2} },
-            { {0, 2}, {1, 1}, {1, 3}, {2, 0}, {2, 2}, {3, 1} }
-        };
+    for (int r = 0; r < grid.getRows() - 2; r++) {
+        for (int c = 0; c < grid.getCols() - 2; c++) {
 
-        for (int r = 0; r < grid.getRows(); r++) {
-            for (int c = 0; c < grid.getCols(); c++) {
-                for (int[][] pattern : patterns) {
-                    if (!isBeehiveAt(grid, r, c, opponentId, pattern)) {
-                        continue;
-                    }
+            //look at all orientations
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && grid.getCell(r + 2, c + 2) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
 
-                    for (int[] cell : pattern) {
-                        int rr = r + cell[0];
-                        int cc = c + cell[1];
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
 
-                        for (int dr = -1; dr <= 1; dr++) {
-                            for (int dc = -1; dc <= 1; dc++) {
-                                int checkRow = rr + dr;
-                                int checkCol = cc + dc;
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c) == opponentId
+                    && grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
 
-                                if (checkRow < 0 || checkRow >= grid.getRows()
-                                        || checkCol < 0 || checkCol >= grid.getCols()) {
-                                    continue;
-                                }
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 1) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && grid.getCell(r + 2, c + 2) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
 
-                                if (grid.getCell(checkRow, checkCol) != -1) {
-                                    continue;
-                                }
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
 
-                                boolean partOfBeehive = false;
-                                for (int[] part : pattern) {
-                                    if ((r + part[0]) == checkRow && (c + part[1]) == checkCol) {
-                                        partOfBeehive = true;
-                                        break;
-                                    }
-                                }
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && grid.getCell(r + 2, c) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
 
-                                if (!partOfBeehive) {
-                                    return new Location(checkRow, checkCol);
-                                }
-                            }
-                        }
-                    }
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 1) == opponentId
+                    && grid.getCell(r + 2, c) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
+
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c) == opponentId
+                    && grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
+
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
+                }
+            }
+            if (grid.getCell(r, c + 1) == opponentId
+                    && grid.getCell(r + 1, c) == opponentId
+                    && grid.getCell(r + 1, c + 1) == opponentId
+                    && grid.getCell(r + 1, c + 2) == opponentId
+                    && grid.getCell(r + 2, c + 1) == opponentId
+                    && isIsolatedHivePlus(grid, r, c)) {
+
+                Location extra = findExtraCell(grid, r, c);
+                if (extra != null) {
+                    return extra;
                 }
             }
         }
-
-        return null;
     }
 
-    public static boolean isIsolatedHivePlus(Grid grid, int centerRow, int centerCol) {
+    return null;
+}
+public static boolean isIsolatedHivePlus(Grid grid, int startRow, int startCol) {
+    int liveCellsInShape = 0;
+
+    for (int row = startRow; row <= startRow + 2; row++) {
+        for (int col = startCol; col <= startCol + 2; col++) {
+            if (grid.getCell(row, col) != -1) {
+                liveCellsInShape++;
+            }
+        }
+    }
+
+    if (liveCellsInShape != 5) {
         return false;
     }
 
-    private static boolean isBeehiveAt(Grid grid, int startRow, int startCol, int opponentId, int[][] pattern) {
-        for (int[] cell : pattern) {
-            int row = startRow + cell[0];
-            int col = startCol + cell[1];
-
+    for (int row = startRow - 1; row <= startRow + 3; row++) {
+        for (int col = startCol - 1; col <= startCol + 3; col++) {
             if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
-                return false;
+                continue;
             }
-            if (grid.getCell(row, col) != opponentId) {
+
+            boolean insideShape = (row >= startRow
+                    && row <= startRow + 2
+                    && col >= startCol
+                    && col <= startCol + 2);
+            if (!insideShape && grid.getCell(row, col) != -1) {
                 return false;
             }
         }
-
-        for (int r = startRow - 1; r <= startRow + 3; r++) {
-            for (int c = startCol - 1; c <= startCol + 4; c++) {
-                if (r < 0 || r >= grid.getRows() || c < 0 || c >= grid.getCols()) {
-                    continue;
-                }
-
-                boolean inPattern = false;
-                for (int[] cell : pattern) {
-                    if (r == startRow + cell[0] && c == startCol + cell[1]) {
-                        inPattern = true;
-                        break;
-                    }
-                }
-
-                if (!inPattern && grid.getCell(r, c) != -1) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
+
+    return true;
+}
+
+public static Location findExtraCell(Grid grid, int r, int c) {
+
+    for (int row = r - 1; row <= r + 3; row++) {
+        for (int col = c - 1; col <= c + 3; col++) {
+            if (row >= 0 && row < grid.getRows() && col >= 0 && col < grid.getCols()
+                    && grid.getCell(row, col) == -1) {
+                return new Location(row, col);
+            }
+        }
+    }
+
+    return null;
+}
+
 
     public static Location findIsolatedHive(Grid grid, int opponentId) {
         for (int r = 1; r < grid.getRows() - 1; r++) {
@@ -233,7 +299,10 @@ public class AbutterflI extends CellAI {
         for (int r = centerRow - 1; r <= centerRow + 1; r++) {
             for (int c = centerCol - 1; c <= centerCol + 1; c++) {
                 if (r < 0 || r >= grid.getRows() || c < 0 || c >= grid.getCols()) {
-                   boolean isPartOfPlus = (r == centerRow && c == centerCol)
+                        continue;
+                    }
+
+                    boolean isPartOfPlus = (r == centerRow && c == centerCol)
                         || (r == centerRow - 1 && c == centerCol)
                         || (r == centerRow + 1 && c == centerCol)
                         || (r == centerRow && c == centerCol - 1)
@@ -241,7 +310,6 @@ public class AbutterflI extends CellAI {
 
                 if (!isPartOfPlus && grid.getCell(r, c) != -1) {
                     return false;
-                }
                 }
             }
         }
@@ -356,8 +424,10 @@ public class AbutterflI extends CellAI {
         boolean p2 = (a == opponent && b == opponent && d == myId && e == myId);
         boolean p3 = (a == myId && b == opponent && d == myId && e == opponent);
         boolean p4 = (a == opponent && b == myId && d == opponent && e == myId);
+        boolean p5 = (a == opponent && b == myId && d == myId && e == opponent);
+        boolean p6 = (a == myId && b == opponent && d == opponent && e == myId);
 
-        return p1 || p2 || p3 || p4;
+        return p1 || p2 || p3 || p4||p5||p6;
     }
 
     private static boolean isIsolated2x2(Grid grid, int startRow, int startCol) {
