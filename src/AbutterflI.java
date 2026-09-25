@@ -1,15 +1,15 @@
 /**
  * STUDENT FILE
  *
- * Name: ______________________________
- * AI Code Name: ______________________
+ * Name: Olivia S
+ * AI Code Name: AbutterflI
  *
- * Strategy Description:
+ Strategy:
  * This AI uses an attack-scoring strategy. Instead of looking for one specific
  * formation, it evaluates every empty cell and scores it based on how many
  * opponent cells surround it, how strongly connected the opponent is, and
  * whether my own cells can support the attack. It chooses the highest-scoring
- * location.
+ * location. If there is a tie or best move is unresolved then it looks for specific cell formations."
  */
 public class AbutterflI extends CellAI {
 
